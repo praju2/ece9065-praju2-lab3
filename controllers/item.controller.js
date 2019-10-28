@@ -1,7 +1,7 @@
 const Item = require('../models/item.model');
 
 
-exports.items = function (req, res) {
+exports.items = function (req, res,next) {
     Item.find({}, function (err, item) {
         if (err) return next(err);
         console.log(item);
@@ -10,7 +10,7 @@ exports.items = function (req, res) {
 };
 
 
-exports.item_details = function (req, res) {
+exports.item_details = function (req, res,next) {
     Item.findById(req.body.id, function (err, item) {
         if (err) return next(err);
         console.log(item);
@@ -18,7 +18,7 @@ exports.item_details = function (req, res) {
     });
 };
 
-exports.item_create = function (req, res) {
+exports.item_create = function (req, res,next) {
 
     let item = new Item(
         {
@@ -37,22 +37,33 @@ exports.item_create = function (req, res) {
     item.save(function (err) {
         if (err) {
             console.log(err);
+            next(err);
         }
         res.send('Product Created successfully');
     }
 
     );
 };
+exports.item_update = function (req, res,next) {
 
-exports.item_update = function (req, res) {
-    Item.findByIdAndUpdate(req.body.id, function (err, item) {
+    Item.findById(req.body.id, function (err, item) {
         if (err) return next(err);
-        console.log(item);
-        res.send(item);
+        if(req.body.copies) item.copies= req.body.copies;
+        if(req.body.image) item.image= req.body.image;
+        item.save(function (err,item) {
+            if (err) {
+                console.log(err);
+                next(err);
+            }
+            res.send(item);
+        }
+    
+        );
+    
     });
 };
 
-exports.item_delete = function (req, res) {
+exports.item_delete = function (req, res,next) {
         Item.findByIdAndDelete(req.body.id, function (err, item) {
             if (err) return next(err);
             console.log(item);

@@ -7,7 +7,7 @@ let itemSchema = new Schema({
     publisher : {type: String, max: 100},
     author : {type: String, max: 200},
     edition : {type: String, max: 20},
-    copies : {type: Number, required: true},
+    copies : {type: Number, required: true,max:99},
     image : {type: String, required: true, max: 400},
     active : {type: Boolean, required: true},
     name_lang_2 : {type: String, required: true, max: 200},
