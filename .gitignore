@@ -1,6 +1,9 @@
 package.json
 package-lock.json
 
+#jshint config files
+.jshintrc
+
 # Logs
 logs
 *.log
