@@ -10,8 +10,7 @@ exports.dueDate_load = function (req, res, next) {
 exports.dueDate_update = function (req, res, next) {
     DueDate.findOne({ id: '1' }, function (err, dueDate) {
         if (err) return next(err);
-        console.log(dueDate);
-        console.log(req.body);
+
         if (req.body.Book >= 0) {
             dueDate.Book = req.body.Book;
         }

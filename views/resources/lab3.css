@@ -195,7 +195,7 @@ button.btn-user-log-in {
   left: 72%;
 }
 
-  button.btn-edit-update,.btn-add-item,.btn-due-date-update,.btn-checkout,.btn-checkout-items{
+  button.btn-edit-update,.btn-add-item,.btn-due-date-update,.btn-checkout,.btn-checkout-items,.btn-info{
   background-color:  #561b8d;
   color: white;
   padding: 6px 12px;
@@ -214,6 +214,11 @@ button.btn-user-log-in {
 .btn-checkout-items-cancel{
   background-color: #f0c14b;
 
+}
+
+
+.btn-info-ok{
+  position: relative;
 }
 
 button.btn-due-date-update,.btn-checkout {
@@ -270,6 +275,11 @@ header{
   background-color: rgba(0,0,0, 0.9); 
   animation-name: fadeIn;
 }
+
+.info-modal{
+  background-color: rgba(0,0,0, 0.9); 
+  animation-name: fadeIn;
+}
   /* Modal Content */
 .modal-content {
   padding: 20px;
@@ -321,6 +331,16 @@ header{
   height: 50%;
  /* overflow: auto;*/
   animation-name: fadeIn;
+ 
+}
+.info-modal-content{
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  background-color: #fefefe;
+  width: 20%;
+  height: 20%;
+ /* overflow: auto;*/
+  animation-name: fadeIn;
   
 
 }
@@ -342,6 +362,10 @@ header{
   }
 
   .checkout-modal .close {
+    display: block; 
+  }
+
+  .info-modal .close {
     display: block; 
   }
   

@@ -11,8 +11,10 @@
 
 <body>
   <header>
-    <img alt="Western University" class="logo_img" height="80px" src="https://ece9065-praju2-lab2.s3.ca-central-1.amazonaws.com/westernlogo.svg">
-    <img alt="User Photo" class="user_img" src="https://ece9065-praju2-lab2.s3.ca-central-1.amazonaws.com/User_Avatar-512.png">
+    <img alt="Western University" class="logo_img" height="80px"
+      src="https://ece9065-praju2-lab2.s3.ca-central-1.amazonaws.com/westernlogo.svg">
+    <img alt="User Photo" class="user_img"
+      src="https://ece9065-praju2-lab2.s3.ca-central-1.amazonaws.com/User_Avatar-512.png">
     <div class='user-info'>
       <label for="lbl-user-name"><span id="disp-ip-user-name" class="disp-text"
           style="text-Transform:capitalize"></span></label>
@@ -31,7 +33,8 @@
       <div class="modal-content login-modal-content">
         <div class="modal-header">
           <span class="close">&times;</span>
-          <img alt="Western University" class="modal_logo_img" src="https://ece9065-praju2-lab2.s3.ca-central-1.amazonaws.com/westernlogo.svg">
+          <img alt="Western University" class="modal_logo_img"
+            src="https://ece9065-praju2-lab2.s3.ca-central-1.amazonaws.com/westernlogo.svg">
         </div>
         <div class="modal-body">
           <h2>ECE 9065 - Lab 2</h2>
@@ -166,6 +169,28 @@
       </div>
     </div>
 
+    <div id="info-modal" class="modal info-modal">
+      <!-- Modal content -->
+      <div class="modal-content info-modal-content">
+        <div class="modal-header">
+          <span class="close" id="info-close">&times;</span>
+          <h2>info</h2>
+        </div>
+        <div class="modal-body">
+          <div id="info-message" class="info-message">
+          <span id="info-message-det"></span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div id="div-info-btn" class="div-info-btn">
+            <form>
+              <button type="button" class="btn-info btn-info-ok" id="btn-info-ok">OK</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
 
     <div class="sub-container1">
       <h1>Library Checkout</h1>
@@ -197,7 +222,8 @@
 
           <form>
             <div class="add-item-image">
-              <img alt="" class="item_img" src="https://ece9065-praju2-lab2.s3.ca-central-1.amazonaws.com/User_Avatar-512.png" id="add-item-img" />
+              <img alt="" class="item_img"
+                src="https://ece9065-praju2-lab2.s3.ca-central-1.amazonaws.com/User_Avatar-512.png" id="add-item-img" />
             </div>
             <table class="table" width="70%">
               <tr>

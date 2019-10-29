@@ -5,6 +5,7 @@ let due_date_cd = 10;
 let modal = document.getElementById("login-modal");
 let edit_modal = document.getElementById("edit-modal");
 let checkout_modal = document.getElementById("checkout-modal");
+let info_modal = document.getElementById("info-modal");
 let due_date_modal = document.getElementById("due-date-modal");
 let selected_lang = "en";
 let itemArray = new Array();
@@ -178,9 +179,25 @@ document.getElementById("edit-modal-close").addEventListener("click", function (
 
 });
 
+document.getElementById("info-close").addEventListener("click", function () {
+  
+  let rootNode=document.getElementById("info-message-det");
+  rootNode.removeChild (rootNode.childNodes[0]);
+  info_modal.style.display = "none";
+});
+
+document.getElementById("btn-info-ok").addEventListener("click", function () {
+  
+  let rootNode=document.getElementById("info-message-det");
+  rootNode.removeChild (rootNode.childNodes[0]);
+  info_modal.style.display = "none";
+});
+
 document.getElementById("checkout-close").addEventListener("click", function () {
   checkout_modal.style.display = "none";
 });
+
+
 
 document.getElementById("btn-checkout-items-cancel").addEventListener("click", function () {
   checkout_modal.style.display = "none";
@@ -735,7 +752,13 @@ class library {
   addToCart(itemId) {
     let count = 0;
     let due_date;
-
+    for (count = 0; count < cart.length; count++) {
+      if (cart[count].id == itemId){
+        document.getElementById("info-message-det").appendChild(document.createTextNode("A copy of " +cart[count].name+" is already available in the cart"));
+        info_modal.style.display="block";
+        return false;
+      }
+    }
 
     for (count = 0; count < this.itemArray.length; count++) {
       if (this.itemArray[count].id == itemId && this.itemArray[count].active) {
@@ -773,6 +796,8 @@ class library {
         basket.insertAdjacentHTML("afterbegin", htmlText);
 
         cart.push(this.itemArray[count]);
+        document.getElementById("info-message-det").appendChild(document.createTextNode(this.itemArray[count].name+" has been added to cart successfully"));
+        info_modal.style.display="block";
         break;
       }
     }
