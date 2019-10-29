@@ -10,7 +10,7 @@ exports.items = function (req, res, next) {
 
 
 exports.item_details = function (req, res, next) {
-    Item.findById(req.body.id, function (err, item) {
+    Item.findById(req.params.id, function (err, item) {
         if (err) return next(err);
         res.send(item);
     });
@@ -34,7 +34,6 @@ exports.item_create = function (req, res, next) {
 
     item.save(function (err) {
         if (err) {
-            console.log(err);
             next(err);
         }
         res.send('Product Created successfully');
@@ -57,7 +56,6 @@ exports.item_update = function (req, res, next) {
 
         item.save(function (err, item) {
             if (err) {
-                console.log(err);
                 next(err);
             }
             res.send(item);
@@ -71,7 +69,6 @@ exports.item_update = function (req, res, next) {
 exports.item_delete = function (req, res, next) {
     Item.findByIdAndDelete(req.body.id, function (err, item) {
         if (err) return next(err);
-        console.log(item);
         res.send(item);
     });
 
