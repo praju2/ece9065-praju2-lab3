@@ -1,28 +1,26 @@
 const Item = require('../models/item.model');
 
 
-exports.items = function (req, res,next) {
+exports.items = function (req, res, next) {
     Item.find({}, function (err, item) {
         if (err) return next(err);
-        console.log(item);
         res.send(item);
     });
 };
 
 
-exports.item_details = function (req, res,next) {
+exports.item_details = function (req, res, next) {
     Item.findById(req.body.id, function (err, item) {
         if (err) return next(err);
-        console.log(item);
         res.send(item);
     });
 };
 
-exports.item_create = function (req, res,next) {
+exports.item_create = function (req, res, next) {
 
     let item = new Item(
         {
-           type: req.body.type,
+            type: req.body.type,
             name: req.body.name,
             publisher: req.body.publisher,
             author: req.body.author,
@@ -30,7 +28,7 @@ exports.item_create = function (req, res,next) {
             copies: req.body.copies,
             image: req.body.image,
             active: req.body.active,
-            name_lang_2 :  req.body.nameObj.name_fr 
+            name_lang_2: req.body.nameObj.name_fr
         }
     );
 
@@ -44,30 +42,35 @@ exports.item_create = function (req, res,next) {
 
     );
 };
-exports.item_update = function (req, res,next) {
-
+exports.item_update = function (req, res, next) {
     Item.findById(req.body.id, function (err, item) {
         if (err) return next(err);
-        if(req.body.copies) item.copies= req.body.copies;
-        if(req.body.image) item.image= req.body.image;
-        item.save(function (err,item) {
+        if (req.body.copies >= 0) {
+        item.copies = req.body.copies;
+            if (item.copies === 0) {
+                item.active = false;
+            }
+        }
+        if (req.body.image) item.image = req.body.image;
+
+        item.save(function (err, item) {
             if (err) {
                 console.log(err);
                 next(err);
             }
             res.send(item);
         }
-    
+
         );
-    
+
     });
 };
 
-exports.item_delete = function (req, res,next) {
-        Item.findByIdAndDelete(req.body.id, function (err, item) {
-            if (err) return next(err);
-            console.log(item);
-            res.send(item);
-        });
+exports.item_delete = function (req, res, next) {
+    Item.findByIdAndDelete(req.body.id, function (err, item) {
+        if (err) return next(err);
+        console.log(item);
+        res.send(item);
+    });
 
 };
