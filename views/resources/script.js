@@ -180,16 +180,16 @@ document.getElementById("edit-modal-close").addEventListener("click", function (
 });
 
 document.getElementById("info-close").addEventListener("click", function () {
-  
-  let rootNode=document.getElementById("info-message-det");
-  rootNode.removeChild (rootNode.childNodes[0]);
+
+  let rootNode = document.getElementById("info-message-det");
+  rootNode.removeChild(rootNode.childNodes[0]);
   info_modal.style.display = "none";
 });
 
 document.getElementById("btn-info-ok").addEventListener("click", function () {
-  
-  let rootNode=document.getElementById("info-message-det");
-  rootNode.removeChild (rootNode.childNodes[0]);
+
+  let rootNode = document.getElementById("info-message-det");
+  rootNode.removeChild(rootNode.childNodes[0]);
   info_modal.style.display = "none";
 });
 
@@ -504,7 +504,7 @@ function login() {
 
 
   if (success) {
-    setParameters();
+    setParameters("login");
     modal.style.display = "none";
     let all = document.getElementsByClassName('validate-login');
     for (let i = 0; i < all.length; i++) {
@@ -514,7 +514,7 @@ function login() {
 
 
 }
-function setParameters() {
+function setParameters(evt) {
   if (admin) {
     document.getElementById("disp-ip-user-name").innerHTML = user_profile.user1.user_disp_name;
     document.getElementById("disp-ip-user-birth-year").innerHTML = "Admin";
@@ -526,7 +526,9 @@ function setParameters() {
     for (let i = 0; i < all.length; i++) {
       all[i].style.display = "none";
     }
-    document.getElementById("btn-edit-delete-items").click();
+    if (evt != "polling") {
+      document.getElementById("btn-edit-delete-items").click();
+    }
 
   }
   else {
@@ -539,8 +541,9 @@ function setParameters() {
     for (let i = 0; i < all.length; i++) {
       all[i].style.display = "block";
     }
-    document.getElementById("btn-items-available").click();
-
+    if (evt != "polling") {
+      document.getElementById("btn-items-available").click();
+    }
   }
 
 }
@@ -571,7 +574,7 @@ function logout() {
   }
 
   //ibObj.reset();
-  restAPIObj.load();
+  restAPIObj.load("onLoad");
   modal.style.display = "block";
 }
 const errMsg = {
@@ -661,8 +664,8 @@ itemAr.forEach(element => {
     });
 
 });
-
 */
+
 
 
 let cart = new Array();
@@ -676,7 +679,8 @@ class library {
   setItemArray(itemArray) {
     this.itemArray = itemArray;
   }
-  reset() {
+  reset(evt) {
+    let count = 0;
 
     let rootNode = document.getElementById("available-items");
     let childNode = rootNode.lastElementChild;
@@ -685,30 +689,35 @@ class library {
       childNode = rootNode.lastElementChild;
     }
 
-    rootNode = document.getElementById("basket");
-    childNode = rootNode.firstElementChild;
-
-    while (childNode && childNode.id != "div-checkout-btn") {
-      rootNode.removeChild(childNode);
+    if (evt != "polling") {
+      rootNode = document.getElementById("basket");
       childNode = rootNode.firstElementChild;
-    }
-    let count = 0;
-    if (cart.length > 0) {
-      cart.forEach((item) => {
-        for (count = 0; count < itemArray.length; count++) {
-          if (item.id == itemArray[count].id) {
-            itemArray[count].copies++;
-            itemArray[count].active = true;
-            break;
+
+      while (childNode && childNode.id != "div-checkout-btn") {
+        rootNode.removeChild(childNode);
+        childNode = rootNode.firstElementChild;
+      }
+      if (cart.length > 0) {
+        cart = [];
+      }
+      if (cart.length <= 0) {
+        document.getElementById("btn-checkout").style.display = "none";
+      }
+
+    } else {
+      cart.forEach(c => {
+        for (count = 0; count < this.itemArray.length; count++) {
+          if (this.itemArray[count].id == c.id) {
+            this.itemArray[count].copies = c.copies;
+            if(this.itemArray[count].copies<=0){
+              this.itemArray[count].active=false;
+            }
           }
         }
-
-
-      }
-      );
-      cart = new Array();
+      });
     }
 
+   
 
     for (count = 0; count < itemArray.length; count++) {
       let htmlText;
@@ -717,7 +726,7 @@ class library {
       } else {
         htmlText = "<div id=\"item" + itemArray[count].id + "\" class=\"items admin\"\>";
       }
-      htmlText = htmlText.concat("<img alt=\"" + itemArray[count].name + "\" class=\"item_img\" src=\"" + itemArray[count].image + "\" />");
+      htmlText = htmlText.concat("<img  class=\"item_img\"  id=\"item_img" + itemArray[count].id + "\" />");
       // htmlText = htmlText.concat("<h4 class=\"item_name\">" + itemArray[count].name + "</h4> by ");
       htmlText = htmlText.concat("<h4 class=\"item_name\" id=\"item_name" + itemArray[count].id + "\"></h4> by ");
       htmlText = htmlText.concat("<h5 id=\"author_name" + itemArray[count].id + "\"></h5>");
@@ -732,6 +741,8 @@ class library {
 
       let available_items = document.getElementById("available-items");
       available_items.insertAdjacentHTML("beforeend", htmlText);
+      document.getElementById("item_img" + itemArray[count].id).setAttribute("src", itemArray[count].image);
+      document.getElementById("item_img" + itemArray[count].id).setAttribute("alt", itemArray[count].name);
       document.getElementById("item_name" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].name));
       document.getElementById("author_name" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].author));
       document.getElementById("publisher" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].publisher));
@@ -740,12 +751,8 @@ class library {
       document.getElementById("copies" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].copies));
 
     }
-
-    if (cart.length <= 0) {
-      document.getElementById("btn-checkout").style.display = "none";
-    }
-
-    setParameters();
+   
+    setParameters(evt);
 
   }
 
@@ -753,9 +760,9 @@ class library {
     let count = 0;
     let due_date;
     for (count = 0; count < cart.length; count++) {
-      if (cart[count].id == itemId){
-        document.getElementById("info-message-det").appendChild(document.createTextNode("A copy of " +cart[count].name+" is already available in the cart"));
-        info_modal.style.display="block";
+      if (cart[count].id == itemId) {
+        document.getElementById("info-message-det").appendChild(document.createTextNode("A copy of " + cart[count].name + " is already available in the cart"));
+        info_modal.style.display = "block";
         return false;
       }
     }
@@ -782,22 +789,30 @@ class library {
 
 
         let htmlText = "<div id=\"divIdBasket" + this.itemArray[count].id + "\" class=\"items\"\>";
-        htmlText = htmlText.concat("<img alt=\"" + this.itemArray[count].name + "\" class=\"item_img\" src=\"" + this.itemArray[count].image + "\" />");
-        htmlText = htmlText.concat("<h4 class=\"item_name\">" + this.itemArray[count].name + "</h4> by ");
-        htmlText = htmlText.concat("<h5>" + this.itemArray[count].author + "</h5>");
-        htmlText = htmlText.concat("<p><b>Publisher:</b> " + itemArray[count].publisher + "   ");
-        htmlText = htmlText.concat("<b>Edition:</b> " + itemArray[count].edition + "    ");
-        htmlText = htmlText.concat("<b>Type:</b> " + itemArray[count].type + "    ");
-        htmlText = htmlText.concat("<b>Due Date:</b> " + due_date.toDateString() + "    ");
+        htmlText = htmlText.concat("<img  class=\"item_img\"  id=\"basket_item_img" + this.itemArray[count].id + "\" />");
+        htmlText = htmlText.concat("<h4 class=\"item_name\" id=\"basket_item_name" + itemArray[count].id + "\"></h4> by ");
+        htmlText = htmlText.concat("<h5 id=\"basket_author_name" + itemArray[count].id + "\"></h5>");
+        htmlText = htmlText.concat("<p>   <b>Publisher:</b><span id=\"basket_publisher" + itemArray[count].id + "\"></span>");
+        htmlText = htmlText.concat("<b>   Edition:</b><span id=\"basket_edition" + itemArray[count].id + "\"></span>");
+        htmlText = htmlText.concat("<b>   Type:</b><span id=\"basket_type" + itemArray[count].id + "\"></span>");
+        htmlText = htmlText.concat("<b>   Due Date:</b><span id=\"basket_due_date" + itemArray[count].id + "\"></span>");
         htmlText = htmlText.concat("<button class=\"btn-add-to-cart\" id=\"btn-add-to-cart\" onclick=\"removeFromCart('" + itemArray[count].id + "')\">Remove from Cart</button>");
         htmlText = htmlText.concat("</div>");
 
         let basket = document.getElementById("basket");
         basket.insertAdjacentHTML("afterbegin", htmlText);
+        document.getElementById("basket_item_img" + this.itemArray[count].id).setAttribute("src", this.itemArray[count].image);
+        document.getElementById("basket_item_img" + this.itemArray[count].id).setAttribute("alt", this.itemArray[count].name);
+        document.getElementById("basket_item_name" + this.itemArray[count].id).appendChild(document.createTextNode(this.itemArray[count].name));
+        document.getElementById("basket_author_name" + this.itemArray[count].id).appendChild(document.createTextNode(this.itemArray[count].author));
+        document.getElementById("basket_publisher" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].publisher));
+        document.getElementById("basket_edition" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].edition));
+        document.getElementById("basket_type" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].type));
+        document.getElementById("basket_due_date" + itemArray[count].id).appendChild(document.createTextNode(due_date.toDateString()));
 
         cart.push(this.itemArray[count]);
-        document.getElementById("info-message-det").appendChild(document.createTextNode(this.itemArray[count].name+" has been added to cart successfully"));
-        info_modal.style.display="block";
+        document.getElementById("info-message-det").appendChild(document.createTextNode("The " + this.itemArray[count].type + ", '" + this.itemArray[count].name + "', has been added to cart"));
+        info_modal.style.display = "block";
         break;
       }
     }
@@ -820,7 +835,7 @@ class library {
         this.itemArray[count].copies++;
         if (this.itemArray[count].copies == 1) {
           let htmlText = "<div id=\"item" + itemArray[count].id + "\" class=\"items\"\>";
-          htmlText = htmlText.concat("<img alt=\"" + itemArray[count].name + "\" class=\"item_img\" src=\"" + itemArray[count].image + "\" />");
+          htmlText = htmlText.concat("<img  class=\"item_img\"  id=\"item_img" + itemArray[count].id + "\" />");
           // htmlText = htmlText.concat("<h4 class=\"item_name\">" + itemArray[count].name + "</h4> by ");
           htmlText = htmlText.concat("<h4 class=\"item_name\" id=\"item_name" + itemArray[count].id + "\"></h4> by ");
           htmlText = htmlText.concat("<h5 id=\"author_name" + itemArray[count].id + "\"></h5>");
@@ -833,6 +848,8 @@ class library {
 
           let available_items = document.getElementById("available-items");
           available_items.insertAdjacentHTML("afterbegin", htmlText);
+          document.getElementById("item_img" + itemArray[count].id).setAttribute("src", itemArray[count].image);
+          document.getElementById("item_img" + itemArray[count].id).setAttribute("alt", itemArray[count].name);
           document.getElementById("item_name" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].name));
           document.getElementById("author_name" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].author));
           document.getElementById("publisher" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].publisher));
@@ -855,22 +872,8 @@ class library {
     }
   }
   editItem(itemId) {
-    let count = 0;
-    for (count = 0; count < this.itemArray.length; count++) {
-      if (this.itemArray[count].id == itemId) {
-        document.getElementById("edit-book-id").value = this.itemArray[count].id;
-        document.getElementById("edit-item-img").setAttribute("src", this.itemArray[count].image);
-        document.getElementById("edit-item-img").setAttribute("alt", this.itemArray[count].name);
-        document.getElementById("edit-item-name").innerHTML = this.itemArray[count].name;
-        document.getElementById("edit-item-author").innerHTML = this.itemArray[count].author;
-        document.getElementById("edit-item-edition").innerHTML = this.itemArray[count].edition;
-        document.getElementById("edit-item-type").innerHTML = this.itemArray[count].type;
-        document.getElementById("edit-item-publisher").innerHTML = this.itemArray[count].publisher;
-        document.getElementById("ip-edit-item-copies").value = this.itemArray[count].copies;
-        edit_modal.style.display = "block";
-        break;
-      }
-    }
+
+    restAPIObj.loadItem(itemId);
   }
 
   deleteItem(itemId) {
@@ -947,14 +950,18 @@ class library {
         due_date = computed_due_date_CD;
       }
       let htmlText = "<div id=\"divIdCheckout" + cart[count].id + "\" class=\"items\"\>";
-      htmlText = htmlText.concat("<h4>" + cart[count].name + "</h4> by ");
-      htmlText = htmlText.concat("<h5>" + cart[count].author + "</h5><br/>");
-      htmlText = htmlText.concat("<b>Type:</b> " + cart[count].type + "    ");
-      htmlText = htmlText.concat("<b>Due Date:</b> " + due_date.toDateString() + "    ");
+      htmlText = htmlText.concat("<h4 id=\"checkout_item_name" + cart[count].id + "\"></h4> by ");
+      htmlText = htmlText.concat("<h5 id=\"checkout_author_name" + cart[count].id + "\"></h5><br/>");
+      htmlText = htmlText.concat("<b>   Type:</b><span id=\"checkout_type" + cart[count].id + "\"></span>");
+      htmlText = htmlText.concat("<b>   Due Date:</b><span id=\"checkout_due_date" + cart[count].id + "\"></span>");
       htmlText = htmlText.concat("</div>");
 
       let checkout_items = document.getElementById("checkout-items");
       checkout_items.insertAdjacentHTML("afterbegin", htmlText);
+      document.getElementById("checkout_item_name" + cart[count].id).appendChild(document.createTextNode(cart[count].name));
+      document.getElementById("checkout_author_name" + cart[count].id).appendChild(document.createTextNode(cart[count].author));
+      document.getElementById("checkout_type" + cart[count].id).appendChild(document.createTextNode(cart[count].type));
+      document.getElementById("checkout_due_date" + cart[count].id).appendChild(document.createTextNode(due_date.toDateString()));
     }
 
     document.getElementById("checkout-total-items").innerHTML = count;
@@ -1051,7 +1058,7 @@ class restAPI {
     this.uri = uri;
   }
 
-  load() {
+  load(evt) {
     let request = new Request(this.uri);
     fetch(request)
       .then(res => res.json())
@@ -1060,13 +1067,36 @@ class restAPI {
         itemArray = [];
         data.forEach(c => itemArray.push(new item(c._id, c.type, c.name, c.publisher, c.author, c.edition, c.copies, c.image, { name_en: c.name, name_fr: c.name_lang_2 }, c.active)));
         libObj.setItemArray(itemArray);
-        this.loadDueDate("onLoad");
+        this.loadDueDate(evt);
 
       })
       .catch(err => {
         alert(err);
       });
   }
+
+  loadItem(item) {
+    let request = new Request(this.uri.concat("/item/") + item);
+    fetch(request)
+      .then(res => res.json())
+      .then(item => {
+        let count = 0;
+        document.getElementById("edit-book-id").value = item.id;
+        document.getElementById("edit-item-img").setAttribute("src", item.image);
+        document.getElementById("edit-item-img").setAttribute("alt", item.name);
+        document.getElementById("edit-item-name").appendChild(document.createTextNode(item.name));
+        document.getElementById("edit-item-author").appendChild(document.createTextNode(item.author));
+        document.getElementById("edit-item-edition").appendChild(document.createTextNode(item.edition));
+        document.getElementById("edit-item-type").appendChild(document.createTextNode(item.type));
+        document.getElementById("edit-item-publisher").appendChild(document.createTextNode(item.publisher));
+        document.getElementById("ip-edit-item-copies").value = item.copies;
+        edit_modal.style.display = "block";
+      })
+      .catch(err => {
+        alert(err);
+      });
+  }
+
 
   loadDueDate(evt) {
     let request = new Request(this.uri.concat("/dueDate/dates"));
@@ -1081,9 +1111,8 @@ class restAPI {
           document.getElementById("ip-due-date-book").value = due_date_book;
           document.getElementById("ip-due-date-cd").value = due_date_cd;
           due_date_modal.style.display = "block";
-        }else
-        {
-          libObj.reset();
+        } else {
+          libObj.reset(evt);
         }
       })
       .catch(err => {
@@ -1118,7 +1147,7 @@ class restAPI {
     });
     fetch(request)
       .then(resp => {
-        this.load();
+        this.load("onLoad");
       })
       .catch(err => {
         alert(err);
@@ -1153,7 +1182,7 @@ class restAPI {
     });
     fetch(request)
       .then(resp => {
-        this.load();
+        this.load("onLoad");
       })
       .catch(err => {
         alert(err);
@@ -1164,5 +1193,7 @@ class restAPI {
 }
 
 let restAPIObj = new restAPI('http://127.0.0.1:8080/library');
-restAPIObj.load();
+setInterval(function () { restAPIObj.load("polling"); }, 2000);
+restAPIObj.load("onLoad");
+
 
