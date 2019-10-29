@@ -26,7 +26,15 @@ const itemSchema= Joi.object().keys({
     }
 }).or('id','_id');
 
+const dueDateSchema= Joi.object().keys({ 
+    id : Joi.string().alphanum(),
+    _id : Joi.string().alphanum(),
+    Book : Joi.number().min(0).max(99).integer().required(),
+    CD : Joi.number().min(0).max(99).integer().required(),
+}).or('id','_id');
+
 // export the schemas
 module.exports = {
-    '/item': itemSchema
+    '/item': itemSchema,
+    '/dates' :dueDateSchema
 };

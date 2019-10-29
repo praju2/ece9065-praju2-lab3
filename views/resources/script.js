@@ -8,7 +8,7 @@ let checkout_modal = document.getElementById("checkout-modal");
 let info_modal = document.getElementById("info-modal");
 let due_date_modal = document.getElementById("due-date-modal");
 let selected_lang = "en";
-let itemArray = new Array();
+let itemArray = [];
 
 Date.prototype.addDays = function (days) { //Stackover flow
   let date = new Date(this.valueOf());
@@ -126,9 +126,9 @@ document.getElementById("ip-user-birth-year").addEventListener("input", function
 });
 document.getElementById("btn-user-log-in").addEventListener("click", login);
 
-document.getElementById("lang_en").addEventListener("click", () => { libObj.changeLang("en"); });
+document.getElementById("lang_en").addEventListener("click", () => { libObj.changeLang("en", "select"); });
 
-document.getElementById("lang_fr").addEventListener("click", () => { libObj.changeLang("fr"); });
+document.getElementById("lang_fr").addEventListener("click", () => { libObj.changeLang("fr", "select"); });
 
 document.getElementById("btn-checkout").addEventListener("click", () => {
   libObj.displayCheckout();
@@ -668,7 +668,7 @@ itemAr.forEach(element => {
 
 
 
-let cart = new Array();
+let cart = [];
 
 
 
@@ -705,19 +705,20 @@ class library {
       }
 
     } else {
+      this.changeLang(selected_lang, "polling");
       cart.forEach(c => {
         for (count = 0; count < this.itemArray.length; count++) {
           if (this.itemArray[count].id == c.id) {
             this.itemArray[count].copies = c.copies;
-            if(this.itemArray[count].copies<=0){
-              this.itemArray[count].active=false;
+            if (this.itemArray[count].copies <= 0) {
+              this.itemArray[count].active = false;
             }
           }
         }
       });
     }
 
-   
+
 
     for (count = 0; count < itemArray.length; count++) {
       let htmlText;
@@ -751,7 +752,7 @@ class library {
       document.getElementById("copies" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].copies));
 
     }
-   
+
     setParameters(evt);
 
   }
@@ -1002,32 +1003,39 @@ class library {
       }
     });
 
-    cart = new Array();
+    cart = [];
     document.getElementById("btn-items-available").click();
     //restAPIObj.load();
   }
 
-  changeLang(lang) {
+  changeLang(lang, evt) {
     let count = 0;
     selected_lang = lang;
-    let all = Array.from(document.getElementsByClassName('item_name'));
-    all.forEach((item) => {
-      for (count = 0; count < itemArray.length; count++) {
-        if (itemArray[count].name == item.innerHTML) {
-          if (lang == "en") {
-            item.innerHTML = itemArray[count].nameObj.name_en;
-            itemArray[count].name = itemArray[count].nameObj.name_en;
+    if (evt == "polling") {
+      itemArray.forEach(c => { if (lang == "en") { c.name = c.nameObj.name_en; } else if (lang == "fr") { c.name = c.nameObj.name_fr; } });
+    }
+    else {
+      let all = Array.from(document.getElementsByClassName('item_name'));
+      all.forEach((item) => {
+        for (count = 0; count < itemArray.length; count++) {
+          if (itemArray[count].name == item.innerHTML) {
+            if (lang == "en") {
+              item.innerHTML = itemArray[count].nameObj.name_en;
 
-          }
-          else if (lang == "fr") {
-            item.innerHTML = itemArray[count].nameObj.name_fr;
-            itemArray[count].name = itemArray[count].nameObj.name_fr;
+              itemArray[count].name = itemArray[count].nameObj.name_en;
 
+            }
+            else if (lang == "fr") {
+              item.innerHTML = itemArray[count].nameObj.name_fr;
+
+              itemArray[count].name = itemArray[count].nameObj.name_fr;
+
+            }
+            break;
           }
-          break;
         }
-      }
-    });
+      });
+    }
 
   }
 }
@@ -1083,11 +1091,11 @@ class restAPI {
         document.getElementById("edit-book-id").value = item._id;
         document.getElementById("edit-item-img").setAttribute("src", item.image);
         document.getElementById("edit-item-img").setAttribute("alt", item.name);
-        document.getElementById("edit-item-name").innerHTML="";
-        document.getElementById("edit-item-author").innerHTML="";
-        document.getElementById("edit-item-edition").innerHTML="";
-        document.getElementById("edit-item-type").innerHTML="";
-        document.getElementById("edit-item-publisher").innerHTML="";
+        document.getElementById("edit-item-name").innerHTML = "";
+        document.getElementById("edit-item-author").innerHTML = "";
+        document.getElementById("edit-item-edition").innerHTML = "";
+        document.getElementById("edit-item-type").innerHTML = "";
+        document.getElementById("edit-item-publisher").innerHTML = "";
 
         document.getElementById("edit-item-name").appendChild(document.createTextNode(item.name));
         document.getElementById("edit-item-author").appendChild(document.createTextNode(item.author));
@@ -1198,7 +1206,7 @@ class restAPI {
 }
 
 let restAPIObj = new restAPI('http://127.0.0.1:8080/library');
-//setInterval(function () { restAPIObj.load("polling"); }, 2000);
+setInterval(function () { restAPIObj.load("polling"); }, 2000);
 restAPIObj.load("onLoad");
 
 
