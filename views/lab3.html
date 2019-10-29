@@ -39,7 +39,7 @@
             <div class="form-group">
               <label for="usr">Name:<span class="form-mandatory-input">*</span></label>
               <input type="text" maxlength="100" class="form-control validate-login" id="ip-user-name"
-                style="text-Transform:capitalize" placeholder="Full Name">
+                style="text-Transform:capitalize" placeholder="Full Name" maxlength="100">
               <span id="err-ip-user-name" class="form-error-msg"></span>
             </div>
             <div class="form-group">
@@ -87,7 +87,7 @@
               <div class="form-group">
                 <label for="lbl_edit-item-copies">Available Copies:<span class="form-mandatory-input">*</span></label>
                 <input type="text" maxlength="2" class="form-control validate-edit" id="ip-edit-item-copies"
-                  placeholder="Number of copies" readonly="true">
+                  placeholder="Number of copies" maxlength="2">
                 <span id="err-ip-edit-item-copies" class="form-error-msg"></span>
               </div>
 
@@ -261,7 +261,7 @@
                   <div class="form-group">
                     <label for="add-item-copies">Copies:<span class="form-mandatory-input">*</span></label>
                     <input type="text" maxlength="1" class="form-control validate-add" id="ip-add-item-copies"
-                      style="text-Transform:capitalize" placeholder="# of copies restricted to 1 for Beta Version">
+                      style="text-Transform:capitalize" placeholder="# of copies between 0 and 99">
                     <span id="err-ip-add-item-copies" class="form-error-msg"></span>
                   </div>
                 </td>
@@ -284,7 +284,7 @@
         </div>
       </div>
     </div>
-    <script type='text/javascript' src='script.js'></script>
+    <script type='text/javascript' src='resources/script.js'></script>
   </div>
 </body>
 

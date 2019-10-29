@@ -7,12 +7,13 @@ let edit_modal = document.getElementById("edit-modal");
 let checkout_modal = document.getElementById("checkout-modal");
 let due_date_modal = document.getElementById("due-date-modal");
 let selected_lang = "en";
+let itemArray = new Array();
 
 Date.prototype.addDays = function (days) { //Stackover flow
   let date = new Date(this.valueOf());
   date.setDate(date.getDate() + days);
   return date;
-}
+};
 
 let date = new Date();
 
@@ -94,11 +95,11 @@ document.getElementById("ip-user-name").addEventListener("input", function () {
 });
 
 document.getElementById("ip-due-date-book").addEventListener("input", function () {
-  validateDueDate(this, errMsg.ip_digit_invalid)
+  validateDueDate(this, errMsg.ip_digit_invalid);
 
 });
 document.getElementById("ip-due-date-cd").addEventListener("input", function () {
-  validateDueDate(this, errMsg.ip_digit_invalid)
+  validateDueDate(this, errMsg.ip_digit_invalid);
 });
 
 function validateDueDate(element, errorMsg) {
@@ -124,9 +125,9 @@ document.getElementById("ip-user-birth-year").addEventListener("input", function
 });
 document.getElementById("btn-user-log-in").addEventListener("click", login);
 
-document.getElementById("lang_en").addEventListener("click", () => { libObj.changeLang("en") });
+document.getElementById("lang_en").addEventListener("click", () => { libObj.changeLang("en"); });
 
-document.getElementById("lang_fr").addEventListener("click", () => { libObj.changeLang("fr") });
+document.getElementById("lang_fr").addEventListener("click", () => { libObj.changeLang("fr"); });
 
 document.getElementById("btn-checkout").addEventListener("click", () => {
   libObj.displayCheckout();
@@ -193,9 +194,8 @@ document.getElementById("btn-checkout-items-ok").addEventListener("click", funct
 
 
 document.getElementById("btn-due-date").addEventListener("click", function () {
-  document.getElementById("ip-due-date-book").value = due_date_book;
-  document.getElementById("ip-due-date-cd").value = due_date_cd;
-  due_date_modal.style.display = "block";
+  restAPIObj.loadDueDate("dueDateModule");
+
 });
 
 document.getElementById("due-date-modal-close").addEventListener("click", function () {
@@ -216,6 +216,7 @@ document.getElementById("btn-edit-update").addEventListener("click", () => {
     itemArray.forEach((item) => {
       if (book_id == item.id) {
         item.updateCopies(document.getElementById("ip-edit-item-copies").value);
+        restAPIObj.update(item);
         edit_modal.style.display = "none";
       }
     });
@@ -223,13 +224,13 @@ document.getElementById("btn-edit-update").addEventListener("click", () => {
     for (let i = 0; i < all.length; i++) {
       all[i].value = "";
     }
-    libObj.reset();
+    //libObj.reset();
   }
 });
 
 document.getElementById("btn-edit-item-image").addEventListener("change", function () {
   if (this.files && this.files[0]) {
-    let edit_item_image = document.getElementById("edit-item-img")
+    let edit_item_image = document.getElementById("edit-item-img");
     edit_item_image.src = URL.createObjectURL(this.files[0]);
 
     let book_id = document.getElementById("edit-book-id").value;
@@ -245,7 +246,7 @@ document.getElementById("btn-edit-item-image").addEventListener("change", functi
 
 document.getElementById("btn-add-item-image").addEventListener("change", function () {
   if (this.files && this.files[0]) {
-    let edit_item_image = document.getElementById("add-item-img")
+    let edit_item_image = document.getElementById("add-item-img");
     edit_item_image.src = URL.createObjectURL(this.files[0]);
   }
 });
@@ -335,7 +336,7 @@ function validateAddItem() {
 function validateCopies(element) {
 
   if (validateNumber(element, errMsg.ip_edit_item_copies_invalid_char)) {
-    if (element.value < 1 || element.value > 1) {
+    if (element.value < 0 || element.value > 99) {
       return displayErrSpan(element, "block", errMsg.ip_edit_item_copies_invalid);
     } else {
       return displayErrSpan(element, "none", "");
@@ -552,7 +553,8 @@ function logout() {
     all[i].classList.remove("invalid");
   }
 
-  libObj.reset();
+  //ibObj.reset();
+  restAPIObj.load();
   modal.style.display = "block";
 }
 const errMsg = {
@@ -567,7 +569,7 @@ const errMsg = {
   ip_user_birth_year_invalid_char: "Only digits allowed.",
   ip_user_birth_year_invalid: "Please enter a valid Year of Birth between 1900 and Current Year.",
   ip_edit_item_copies_invalid_char: "Only digits allowed.",
-  ip_edit_item_copies_invalid: "Number of copies is restricted to 1 for Beta Version.",
+  ip_edit_item_copies_invalid: "Number of copies should be between 0 and 99.",
   ip_alpha_num_invalid: "Should only contain alphabets and Numbers.",
   ip_due_date_invalid: "Please enter number of days between 1 and 99 (both inclusive)."
 };
@@ -582,8 +584,9 @@ const user_profile = {
 };
 
 class item {
-  constructor(id, type, name, publisher, author, edition, copies, image, nameObj) {
-    this.id = Math.floor((Math.random() * 1000000) + 1);//id;
+  constructor(id, type, name, publisher, author, edition, copies, image, nameObj, active = true) {
+    //this.id = Math.floor((Math.random() * 1000000) + 1);//id;
+    this.id = id;
     this.type = type;
     this.name = name;
     this.publisher = publisher;
@@ -591,13 +594,16 @@ class item {
     this.edition = edition;
     this.copies = copies;
     this.image = image;
-    this.active = true;
+    this.active = active;
     this.nameObj = nameObj;
 
   }
 
   updateCopies(copies) {
     this.copies = copies;
+    if (copies > 0) {
+      this.active = true;
+    }
   }
   updateImage(image) {
     this.image = image;
@@ -605,7 +611,7 @@ class item {
 }
 
 
-let itemArray = new Array(new item("1", "Book", "Clean Code: A Handbook of Agile Software Craftsmanship", "Publisher", "Robert C. Martin ", "12th Edition", 1, "https://ece9065-praju2-lab2.s3.ca-central-1.amazonaws.com/clean+code.jpg", { name_en: "Clean Code: A Handbook of Agile Software Craftsmanship", name_fr: "Clean Code: Un manuel d'artisanat logiciel agile" }),
+/*let itemAr = new Array(new item("1", "Book", "Clean Code: A Handbook of Agile Software Craftsmanship", "Publisher", "Robert C. Martin ", "12th Edition", 1, "https://ece9065-praju2-lab2.s3.ca-central-1.amazonaws.com/clean+code.jpg", { name_en: "Clean Code: A Handbook of Agile Software Craftsmanship", name_fr: "Clean Code: Un manuel d'artisanat logiciel agile" }),
   new item("2", "Book", "The Clean Coder: A Code of Conduct for Professional Programmers", "Publisher", "Robert C. Martin ", "12th Edition", 1, "https://ece9065-praju2-lab2.s3.ca-central-1.amazonaws.com/clean+coder.jpg", { name_en: "The Clean Coder: A Code of Conduct for Professional Programmers", name_fr: "The Clean Coder: Un code de conduite pour les programmeurs professionnels" }),
   new item("3", "Book", "Clean Architecture: A Craftsman's Guide to Software Structure and Design", "Publisher", "Robert C. Martin ", "12th Edition", 1, "https://ece9065-praju2-lab2.s3.ca-central-1.amazonaws.com/clean+architecture.jpg", { name_en: "Clean Architecture: A Craftsman's Guide to Software Structure and Design", name_fr: "Clean Architecture: Guide de l'artisan sur la structure et la conception de logiciels" }),
   new item("4", "Book", "Becoming", "Publisher", "Michelle Obama", "1st Edition", 1, "https://ece9065-praju2-lab2.s3.ca-central-1.amazonaws.com/Becoming.jpg", { name_en: "Becoming", name_fr: "Devenir" }),
@@ -617,6 +623,31 @@ let itemArray = new Array(new item("1", "Book", "Clean Code: A Handbook of Agile
   new item("10", "CD", "Common Ground", "Publisher", "Justin Trudeau", "9th Edition", 1, "https://ece9065-praju2-lab2.s3.ca-central-1.amazonaws.com/Common+Ground+Trudeau.jpg", { name_en: "Common Ground", name_fr: "Terrain d'entente" })
 );
 
+itemAr.forEach(element => {
+
+  var request = new Request('http://127.0.0.1:8080/library/item', {
+    method: 'post',
+    //mode : 'no-cors',
+    headers: new Headers({
+      'Content-Type': 'application/json'
+    }),
+    body: JSON.stringify(element)
+  });
+
+  // Now use it!
+  fetch(request)
+    .then(resp => {
+      let b = 1;
+    })
+    .catch(err => {
+      let b = 3;
+    });
+
+});
+
+*/
+
+
 let cart = new Array();
 
 
@@ -625,7 +656,9 @@ class library {
   constructor(itemArray) {
     this.itemArray = itemArray;
   }
-
+  setItemArray(itemArray) {
+    this.itemArray = itemArray;
+  }
   reset() {
 
     let rootNode = document.getElementById("available-items");
@@ -655,35 +688,40 @@ class library {
 
 
       }
-      )
+      );
       cart = new Array();
     }
 
 
     for (count = 0; count < itemArray.length; count++) {
+      let htmlText;
       if (this.itemArray[count].active) {
-        let htmlText = "<div id=\"item" + itemArray[count].id + "\" class=\"items\"\>";
-        htmlText = htmlText.concat("<img alt=\"" + itemArray[count].name + "\" class=\"item_img\" src=\"" + itemArray[count].image + "\" />");
-        // htmlText = htmlText.concat("<h4 class=\"item_name\">" + itemArray[count].name + "</h4> by ");
-        htmlText = htmlText.concat("<h4 class=\"item_name\" id=\"item_name" + itemArray[count].id + "\"></h4> by ");
-        htmlText = htmlText.concat("<h5>" + itemArray[count].author + "</h5>");
-        htmlText = htmlText.concat("<p><b>Publisher:</b> " + itemArray[count].publisher + "   ");
-        htmlText = htmlText.concat("<b>Edition:</b> " + itemArray[count].edition + "    ");
-        htmlText = htmlText.concat("<b>Type:</b> " + itemArray[count].type + "    ");
-        htmlText = htmlText.concat("<b>Copies:</b> " + itemArray[count].copies + "</p>");
-        htmlText = htmlText.concat("<button class=\"btn-add-to-cart non-admin\" id=\"btn-add-to-cart\" onclick=\"addTocart('" + itemArray[count].id + "')\">Add to Cart</button>");
-        htmlText = htmlText.concat("<button class=\"btn-edit admin\" id=\"btn-edit\" onclick=\"editItem('" + itemArray[count].id + "')\">Edit</button>");
-        htmlText = htmlText.concat("<button class=\"btn-delete admin\" id=\"btn-delete\" onclick=\"deleteItem('" + itemArray[count].id + "')\">Delete</button>");
-        htmlText = htmlText.concat("</div>");
-
-        let available_items = document.getElementById("available-items");
-        available_items.insertAdjacentHTML("beforeend", htmlText);
-        document.getElementById("item_name" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].name));
-        /*createTextNode was used only to showcase the usage, but for the scenarios described in assignment 2, insertAdjacentHTML is best suited for following reasons
-        1) insertAdjacentHTML is faster than createElement while compromising on flexiblity. As the div layout remains the same for every item, such level of flexiblity is not required and page can be loaded much faster and interactive.
-        2) The inputs are pre sanitized. Therefore, creteTextNode is redundant as the user will not be able to inject any malicious code. 
-      */
+        htmlText = "<div id=\"item" + itemArray[count].id + "\" class=\"items\"\>";
+      } else {
+        htmlText = "<div id=\"item" + itemArray[count].id + "\" class=\"items admin\"\>";
       }
+      htmlText = htmlText.concat("<img alt=\"" + itemArray[count].name + "\" class=\"item_img\" src=\"" + itemArray[count].image + "\" />");
+      // htmlText = htmlText.concat("<h4 class=\"item_name\">" + itemArray[count].name + "</h4> by ");
+      htmlText = htmlText.concat("<h4 class=\"item_name\" id=\"item_name" + itemArray[count].id + "\"></h4> by ");
+      htmlText = htmlText.concat("<h5 id=\"author_name" + itemArray[count].id + "\"></h5>");
+      htmlText = htmlText.concat("<p>   <b>Publisher:</b><span id=\"publisher" + itemArray[count].id + "\"></span>");
+      htmlText = htmlText.concat("<b>   Edition:</b><span id=\"edition" + itemArray[count].id + "\"></span>");
+      htmlText = htmlText.concat("<b>   Type:</b><span id=\"type" + itemArray[count].id + "\"></span>");
+      htmlText = htmlText.concat("<b>   Copies:</b><span id=\"copies" + itemArray[count].id + "\"></span></p>");
+      htmlText = htmlText.concat("<button class=\"btn-add-to-cart non-admin\" id=\"btn-add-to-cart\" onclick=\"addTocart('" + itemArray[count].id + "')\">Add to Cart</button>");
+      htmlText = htmlText.concat("<button class=\"btn-edit admin\" id=\"btn-edit\" onclick=\"editItem('" + itemArray[count].id + "')\">Edit</button>");
+      htmlText = htmlText.concat("<button class=\"btn-delete admin\" id=\"btn-delete\" onclick=\"deleteItem('" + itemArray[count].id + "')\">Delete</button>");
+      htmlText = htmlText.concat("</div>");
+
+      let available_items = document.getElementById("available-items");
+      available_items.insertAdjacentHTML("beforeend", htmlText);
+      document.getElementById("item_name" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].name));
+      document.getElementById("author_name" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].author));
+      document.getElementById("publisher" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].publisher));
+      document.getElementById("edition" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].edition));
+      document.getElementById("type" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].type));
+      document.getElementById("copies" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].copies));
+
     }
 
     if (cart.length <= 0) {
@@ -706,6 +744,9 @@ class library {
           let removeObj = document.getElementById("item" + this.itemArray[count].id);
           removeObj.remove();
           this.itemArray[count].active = false;
+        }
+        else {
+          document.getElementById("copies" + this.itemArray[count].id).innerHTML = this.itemArray[count].copies;
         }
 
 
@@ -755,19 +796,29 @@ class library {
         if (this.itemArray[count].copies == 1) {
           let htmlText = "<div id=\"item" + itemArray[count].id + "\" class=\"items\"\>";
           htmlText = htmlText.concat("<img alt=\"" + itemArray[count].name + "\" class=\"item_img\" src=\"" + itemArray[count].image + "\" />");
-          htmlText = htmlText.concat("<h4 class=\"item_name\">" + itemArray[count].name + "</h4> by ");
-          htmlText = htmlText.concat("<h5>" + itemArray[count].author + "</h5>");
-          htmlText = htmlText.concat("<p><b>Publisher:</b> " + itemArray[count].publisher + "   ");
-          htmlText = htmlText.concat("<b>Edition:</b> " + itemArray[count].edition + "    ");
-          htmlText = htmlText.concat("<b>Type:</b> " + itemArray[count].type + "    ");
-          htmlText = htmlText.concat("<b>Copies:</b> " + itemArray[count].copies + "</p>");
-          htmlText = htmlText.concat("<button class=\"btn-add-to-cart\" id=\"btn-add-to-cart\" onclick=\"addTocart('" + itemArray[count].id + "')\">Add to Cart</button>");
+          // htmlText = htmlText.concat("<h4 class=\"item_name\">" + itemArray[count].name + "</h4> by ");
+          htmlText = htmlText.concat("<h4 class=\"item_name\" id=\"item_name" + itemArray[count].id + "\"></h4> by ");
+          htmlText = htmlText.concat("<h5 id=\"author_name" + itemArray[count].id + "\"></h5>");
+          htmlText = htmlText.concat("<p>   <b>Publisher:</b><span id=\"publisher" + itemArray[count].id + "\"></span>");
+          htmlText = htmlText.concat("<b>   Edition:</b><span id=\"edition" + itemArray[count].id + "\"></span>");
+          htmlText = htmlText.concat("<b>   Type:</b><span id=\"type" + itemArray[count].id + "\"></span>");
+          htmlText = htmlText.concat("<b>   Copies:</b><span id=\"copies" + itemArray[count].id + "\"></span></p>");
+          htmlText = htmlText.concat("<button class=\"btn-add-to-cart non-admin\" id=\"btn-add-to-cart\" onclick=\"addTocart('" + itemArray[count].id + "')\">Add to Cart</button>");
           htmlText = htmlText.concat("</div>");
 
           let available_items = document.getElementById("available-items");
           available_items.insertAdjacentHTML("afterbegin", htmlText);
+          document.getElementById("item_name" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].name));
+          document.getElementById("author_name" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].author));
+          document.getElementById("publisher" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].publisher));
+          document.getElementById("edition" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].edition));
+          document.getElementById("type" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].type));
+          document.getElementById("copies" + itemArray[count].id).appendChild(document.createTextNode(itemArray[count].copies));
+
           this.itemArray[count].active = true;
 
+        } else {
+          document.getElementById("copies" + this.itemArray[count].id).innerHTML = this.itemArray[count].copies;
         }
 
 
@@ -804,11 +855,12 @@ class library {
         let removeObj = document.getElementById("item" + this.itemArray[count].id);
         removeObj.remove();
         this.itemArray[count].active = false;
+        restAPIObj.delete(this.itemArray[count]);
         break;
       }
     }
-    // this.reset();
   }
+
   addItem() {
     let itemObj = new item("99",
       document.getElementById("ip-add-item-type").value,
@@ -822,16 +874,16 @@ class library {
 
 
     this.itemArray.push(itemObj);
-    libObj.reset();
+    restAPIObj.create(itemObj);
+    //libObj.reset();
     let all = document.getElementsByClassName('validate-add');
     for (let i = 0; i < all.length; i++) {
       all[i].value = "";
     }
     document.getElementById("btn-add-item-image").value = "";
     document.getElementById("add-item-img").src = "https://ece9065-praju2-lab2.s3.ca-central-1.amazonaws.com/User_Avatar-512.png";
-
-
   }
+
   updateDueDate() {
     date = new Date();
     due_date_book = Number(document.getElementById("ip-due-date-book").value);
@@ -843,8 +895,7 @@ class library {
     for (let i = 0; i < all.length; i++) {
       all[i].value = "";
     }
-
-    //this.reset();
+    restAPIObj.updateDueDate({ Book: due_date_book, CD: due_date_cd });
 
   }
 
@@ -912,19 +963,16 @@ class library {
       for (count = 0; count < itemArray.length; count++) {
 
         if (item.id == itemArray[count].id) {
-          itemArray.splice(count, 1);
+          restAPIObj.update(itemArray[count]);
+          //itemArray.splice(count, 1);
           break;
         }
       }
-
-
     });
 
     cart = new Array();
     document.getElementById("btn-items-available").click();
-
-
-
+    //restAPIObj.load();
   }
 
   changeLang(lang) {
@@ -947,14 +995,13 @@ class library {
           break;
         }
       }
-    })
+    });
 
   }
 }
 
 let libObj = new library(itemArray);
-//libObj.addToCart("hi");
-libObj.reset();
+
 function addTocart(val) {
   libObj.addToCart(val);
 
@@ -972,5 +1019,125 @@ function editItem(val) {
 
 function deleteItem(val) {
   libObj.deleteItem(val);
+}
+
+class restAPI {
+  constructor(uri) {
+    this.uri = uri;
+  }
+
+  load() {
+    let request = new Request(this.uri);
+    fetch(request)
+      .then(res => res.json())
+      .then(data => {
+        //itemArray = itemArray.splice(0, itemArray.length);
+        itemArray = [];
+        data.forEach(c => itemArray.push(new item(c._id, c.type, c.name, c.publisher, c.author, c.edition, c.copies, c.image, { name_en: c.name, name_fr: c.name_lang_2 }, c.active)));
+        libObj.setItemArray(itemArray);
+        this.loadDueDate("onLoad");
+
+      })
+      .catch(err => {
+        alert(err);
+      });
+  }
+
+  loadDueDate(evt) {
+    let request = new Request(this.uri.concat("/dueDate/dates"));
+    fetch(request)
+      .then(res => res.json())
+      .then(data => {
+        due_date_book = data.Book;
+        due_date_cd = data.CD;
+        computed_due_date_book = date.addDays(due_date_book);
+        computed_due_date_CD = date.addDays(due_date_cd);
+        if (evt === "dueDateModule") {
+          document.getElementById("ip-due-date-book").value = due_date_book;
+          document.getElementById("ip-due-date-cd").value = due_date_cd;
+          due_date_modal.style.display = "block";
+        }else
+        {
+          libObj.reset();
+        }
+      })
+      .catch(err => {
+        alert(err);
+      });
+  }
+
+  updateDueDate(element) {
+    let request = new Request(this.uri.concat("/dueDate/dates"), {
+      method: 'PUT',
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      }),
+      body: JSON.stringify(element)
+    });
+    fetch(request)
+      .then(resp => {
+
+      })
+      .catch(err => {
+        alert(err);
+      });
+  }
+
+  create(element) {
+    let request = new Request(this.uri.concat("/item"), {
+      method: 'post',
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      }),
+      body: JSON.stringify(element)
+    });
+    fetch(request)
+      .then(resp => {
+        this.load();
+      })
+      .catch(err => {
+        alert(err);
+      });
+
+  }
+
+  delete(element) {
+    let request = new Request(this.uri.concat("/item"), {
+      method: 'DELETE',
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      }),
+      body: JSON.stringify(element)
+    });
+    fetch(request)
+      .then(resp => {
+
+      })
+      .catch(err => {
+        alert(err);
+      });
+  }
+
+  update(element) {
+    let request = new Request(this.uri.concat("/item"), {
+      method: 'PUT',
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      }),
+      body: JSON.stringify(element)
+    });
+    fetch(request)
+      .then(resp => {
+        this.load();
+      })
+      .catch(err => {
+        alert(err);
+      });
+  }
+
 
 }
+
+let restAPIObj = new restAPI('http://127.0.0.1:8080/library');
+restAPIObj.load();
+
