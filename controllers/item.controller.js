@@ -49,6 +49,8 @@ exports.item_update = function (req, res, next) {
         item.copies = req.body.copies;
             if (item.copies === 0) {
                 item.active = false;
+            }else if (item.copies > 0) {
+                item.active = true;
             }
         }
         if (req.body.image) item.image = req.body.image;
