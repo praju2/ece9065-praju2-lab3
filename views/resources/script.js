@@ -1080,10 +1080,15 @@ class restAPI {
     fetch(request)
       .then(res => res.json())
       .then(item => {
-        let count = 0;
-        document.getElementById("edit-book-id").value = item.id;
+        document.getElementById("edit-book-id").value = item._id;
         document.getElementById("edit-item-img").setAttribute("src", item.image);
         document.getElementById("edit-item-img").setAttribute("alt", item.name);
+        document.getElementById("edit-item-name").innerHTML="";
+        document.getElementById("edit-item-author").innerHTML="";
+        document.getElementById("edit-item-edition").innerHTML="";
+        document.getElementById("edit-item-type").innerHTML="";
+        document.getElementById("edit-item-publisher").innerHTML="";
+
         document.getElementById("edit-item-name").appendChild(document.createTextNode(item.name));
         document.getElementById("edit-item-author").appendChild(document.createTextNode(item.author));
         document.getElementById("edit-item-edition").appendChild(document.createTextNode(item.edition));
@@ -1193,7 +1198,7 @@ class restAPI {
 }
 
 let restAPIObj = new restAPI('http://127.0.0.1:8080/library');
-setInterval(function () { restAPIObj.load("polling"); }, 2000);
+//setInterval(function () { restAPIObj.load("polling"); }, 2000);
 restAPIObj.load("onLoad");
 
 
