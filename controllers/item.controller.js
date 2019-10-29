@@ -42,10 +42,12 @@ exports.item_create = function (req, res, next) {
     );
 };
 exports.item_update = function (req, res, next) {
+  
     Item.findById(req.body.id, function (err, item) {
         if (err) return next(err);
+
         if (req.body.copies >= 0) {
-        item.copies = req.body.copies;
+           item.copies = req.body.copies;
             if (item.copies === 0) {
                 item.active = false;
             }else if (item.copies > 0) {
@@ -53,7 +55,6 @@ exports.item_update = function (req, res, next) {
             }
         }
         if (req.body.image) item.image = req.body.image;
-
         item.save(function (err, item) {
             if (err) {
                 next(err);
