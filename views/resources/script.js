@@ -407,7 +407,9 @@ function validateCharInput(element, errMsg) {
 }
 
 function validateAlphaNumInput(element, errMsg) {
-  let letters = /^[ a-zA-Z0-9]*$/i;
+  //let letters = /^[ a-zA-Z0-9]*$/i;
+
+  let letters = /^[ :'.\p{L}\p{N}]+$/u;
   //this.value=this.value.trim();
   if (!element.value.match(letters)) {
     return displayErrSpan(element, "block", errMsg);
@@ -1106,7 +1108,7 @@ class restAPI {
         edit_modal.style.display = "block";
       })
       .catch(err => {
-        alert(err);
+        alert('Error : Contact Admin');
       });
   }
 
@@ -1206,7 +1208,7 @@ class restAPI {
 }
 
 let restAPIObj = new restAPI('http://127.0.0.1:8080/library');
-setInterval(function () { restAPIObj.load("polling"); }, 2000);
+//setInterval(function () { restAPIObj.load("polling"); }, 2000);
 restAPIObj.load("onLoad");
 
 
