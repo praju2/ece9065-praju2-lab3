@@ -1207,8 +1207,8 @@ class restAPI {
 
 }
 
-let restAPIObj = new restAPI('http://127.0.0.1:8080/library');
-//setInterval(function () { restAPIObj.load("polling"); }, 2000);
+let restAPIObj = new restAPI('http://3.231.38.175:8080/library');
+setInterval(function () { restAPIObj.load("polling"); }, 2000);
 restAPIObj.load("onLoad");
 
 
