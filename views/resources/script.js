@@ -138,33 +138,33 @@ document.getElementById("btn-checkout").addEventListener("click", () => {
 
 
 document.getElementById("btn-due-date-update").addEventListener("click", validateDueDateBtn);
+//Start of Comment - Commented as instructed by TA for highlighting the sanitization or validation
+// function validateDueDateBtn() {
 
-function validateDueDateBtn() {
+//   let element = document.getElementsByClassName("validate-due-date");
+//   let i;
+//   let success = true;
+//   for (i = 0; i < element.length; i++) {
 
-  let element = document.getElementsByClassName("validate-due-date");
-  let i;
-  let success = true;
-  for (i = 0; i < element.length; i++) {
+//     if (element[i].value == '') {
+//       document.getElementById("err-" + element[i].id).innerHTML = errMsg.mandatory;
+//       displayErrSpan(element[i], "block", errMsg.mandatory);
+//       success = false;
 
-    if (element[i].value == '') {
-      document.getElementById("err-" + element[i].id).innerHTML = errMsg.mandatory;
-      displayErrSpan(element[i], "block", errMsg.mandatory);
-      success = false;
+//     }
+//     else if (element[i].id === "ip-due-date-book") {
+//       if (!validateDueDate(element[i], errMsg.ip_digit_invalid)) { success = false; }
+//     }
+//     else if (element[i].id === "ip-due-date-cd") {
+//       if (!validateDueDate(element[i], errMsg.ip_digit_invalid)) { success = false; }
+//     }
 
-    }
-    else if (element[i].id === "ip-due-date-book") {
-      if (!validateDueDate(element[i], errMsg.ip_digit_invalid)) { success = false; }
-    }
-    else if (element[i].id === "ip-due-date-cd") {
-      if (!validateDueDate(element[i], errMsg.ip_digit_invalid)) { success = false; }
-    }
-
-  }
-  if (success) {
-    libObj.updateDueDate();
-  }
-}
-
+//   }
+//   if (success) {
+//     libObj.updateDueDate();
+//   }
+// }
+//End of Comment - Commented as instructed by TA for highlighting the sanitization or validation
 
 document.getElementById("edit-modal-close").addEventListener("click", function () {
   edit_modal.style.display = "none";
@@ -302,170 +302,174 @@ document.getElementById("btn-add-item").addEventListener("click", function () {
   validateAddItem();
 });
 
-function validateAddItem() {
+//Start of Comment - Commented as instructed by TA for highlighting the sanitization or validation
+// function validateAddItem() {
 
-  let element = document.getElementsByClassName("validate-add");
-  let i;
-  let success = true;
-  for (i = 0; i < element.length; i++) {
+//   let element = document.getElementsByClassName("validate-add");
+//   let i;
+//   let success = true;
+//   for (i = 0; i < element.length; i++) {
 
-    if (element[i].value == '') {
-      document.getElementById("err-" + element[i].id).innerHTML = errMsg.mandatory;
-      displayErrSpan(element[i], "block", errMsg.mandatory);
-      success = false;
+//     if (element[i].value == '') {
+//       document.getElementById("err-" + element[i].id).innerHTML = errMsg.mandatory;
+//       displayErrSpan(element[i], "block", errMsg.mandatory);
+//       success = false;
 
-    }
-    /* else if (element[i].id == "add-item-img") {
-       if(element[i].src=="resources/images/User_Avatar-512.png")
-     {
-       document.getElementById("err-btn-add-item-image").innerHTML = errMsg.mandatory;
-       displayErrSpan(ocument.getElementById("btn-add-item-image"), "block", errMsg.mandatory);
-       success = false; }
-    }*/
-    else if (element[i].id === "ip-add-item-name") {
-      if (!validateAlphaNumInput(element[i], errMsg.ip_alpha_num_invalid)) { success = false; }
-    }
-    else if (element[i].id === "ip-add-item-name-fr") {
-      if (!validateAlphaNumInput(element[i], errMsg.ip_alpha_num_invalid)) { success = false; }
-    }
-    else if (element[i].id === "ip-add-item-author") {
-      if (!validateCharInput(element[i], errMsg.ip_char_invalid)) { success = false; }
-    }
-    else if (element[i].id === "ip-add-item-publisher") {
-      if (!validateAlphaNumInput(element[i], errMsg.ip_alpha_num_invalid)) { success = false; }
-    }
-    else if (element[i].id === "ip-add-item-edition") {
-      if (!validateAlphaNumInput(element[i], errMsg.ip_alpha_num_invalid)) { success = false; }
-    }
-    else if (element[i].id === "ip-add-item-copies") {
-      if (!validateCopies(element[i])) { success = false; }
-    }
-
-
-  }
-  if (success) {
-    libObj.addItem();
-
-  }
-
-}
-
-function validateCopies(element) {
-
-  if (validateNumber(element, errMsg.ip_edit_item_copies_invalid_char)) {
-    if (element.value < 0 || element.value > 99) {
-      return displayErrSpan(element, "block", errMsg.ip_edit_item_copies_invalid);
-    } else {
-      return displayErrSpan(element, "none", "");
-    }
-  } else {
-    return displayErrSpan(element, "block", errMsg.ip_edit_item_copies_invalid_char);
-  }
-
-}
-
-function validateBirthYear(element) {
-  if (validateNumber(element, errMsg.ip_user_birth_year_invalid_char)) {
-    if (!validateAdminUser(element)) {
-      return validateYear(element, errMsg.ip_user_birth_year_invalid);
-    }
-    else {
-      return true;
-    }
-  } else { return false; }
-}
-
-function validateAdminUser(element) {
-  if (document.getElementById("ip-user-name").value.toLowerCase() == user_profile.user1.user_id) {
-    if (Number(document.getElementById("ip-user-birth-year").value) != user_profile.user1.user_birth_year) {
-      admin = false;
-      return validateYear(element, errMsg.ip_user_birth_year_invalid);
-    }
-
-    else {
-      admin = true;
-      return displayErrSpan(element, "none", "");
-
-    }
-  }
-  admin = false;
-
-}
-
-function validateCharInput(element, errMsg) {
-  let letters = /^[ a-z]*$/i;
-  //this.value=this.value.trim();
-  if (!element.value.match(letters)) {
-    return displayErrSpan(element, "block", errMsg);
-
-  }
-  else {
-    return displayErrSpan(element, "none", "");
-
-  }
-
-}
-
-function validateAlphaNumInput(element, errMsg) {
-  //let letters = /^[ a-zA-Z0-9]*$/i;
-
-  let letters = /^[ :'.\p{L}\p{N}]+$/u;
-  //this.value=this.value.trim();
-  if (!element.value.match(letters)) {
-    return displayErrSpan(element, "block", errMsg);
-
-  }
-  else {
-    return displayErrSpan(element, "none", "");
-
-  }
-
-}
-
-function validateEmail(element, errMsg) {
-  element.value = element.value.trim();
-  let mailFormat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/; //Pattern extracted from https://www.w3resource.com/javascript/form/email-validation.php
-  if (element.value != '' && !element.value.match(mailFormat)) {
-    return displayErrSpan(element, "block", errMsg);
-
-  }
-  else {
-    return displayErrSpan(element, "none", "");
-
-  }
-
-}
-
-function validateNumber(element, errMsg) {
-  element.value = element.value.trim();
-  let numberFormat = /^[0-9]*$/i;
-  if (!element.value.match(numberFormat)) {
-    return displayErrSpan(element, "block", errMsg);
-
-  }
-  else {
-    return displayErrSpan(element, "none", "");
-
-  }
-}
+//     }
+//     /* else if (element[i].id == "add-item-img") {
+//        if(element[i].src=="resources/images/User_Avatar-512.png")
+//      {
+//        document.getElementById("err-btn-add-item-image").innerHTML = errMsg.mandatory;
+//        displayErrSpan(ocument.getElementById("btn-add-item-image"), "block", errMsg.mandatory);
+//        success = false; }
+//     }*/
+//     else if (element[i].id === "ip-add-item-name") {
+//       if (!validateAlphaNumInput(element[i], errMsg.ip_alpha_num_invalid)) { success = false; }
+//     }
+//     else if (element[i].id === "ip-add-item-name-fr") {
+//       if (!validateAlphaNumInput(element[i], errMsg.ip_alpha_num_invalid)) { success = false; }
+//     }
+//     else if (element[i].id === "ip-add-item-author") {
+//       if (!validateCharInput(element[i], errMsg.ip_char_invalid)) { success = false; }
+//     }
+//     else if (element[i].id === "ip-add-item-publisher") {
+//       if (!validateAlphaNumInput(element[i], errMsg.ip_alpha_num_invalid)) { success = false; }
+//     }
+//     else if (element[i].id === "ip-add-item-edition") {
+//       if (!validateAlphaNumInput(element[i], errMsg.ip_alpha_num_invalid)) { success = false; }
+//     }
+//     else if (element[i].id === "ip-add-item-copies") {
+//       if (!validateCopies(element[i])) { success = false; }
+//     }
 
 
-function validateYear(element, errMsg) {
-  element.value = element.value.trim();
+//   }
+//   if (success) {
+//     libObj.addItem();
 
-  if (element.value != '' && (Number(element.value) > Number(currentYear) || Number(element.value) < 1900)) {
-    return displayErrSpan(element, "block", errMsg);
+//   }
 
-  }
-  else {
-    return displayErrSpan(element, "none", "");
-
-  }
+// }
 
 
 
+// function validateCopies(element) {
 
-}
+//   if (validateNumber(element, errMsg.ip_edit_item_copies_invalid_char)) {
+//     if (element.value < 0 || element.value > 99) {
+//       return displayErrSpan(element, "block", errMsg.ip_edit_item_copies_invalid);
+//     } else {
+//       return displayErrSpan(element, "none", "");
+//     }
+//   } else {
+//     return displayErrSpan(element, "block", errMsg.ip_edit_item_copies_invalid_char);
+//   }
+
+// }
+
+// function validateBirthYear(element) {
+//   if (validateNumber(element, errMsg.ip_user_birth_year_invalid_char)) {
+//     if (!validateAdminUser(element)) {
+//       return validateYear(element, errMsg.ip_user_birth_year_invalid);
+//     }
+//     else {
+//       return true;
+//     }
+//   } else { return false; }
+// }
+
+// function validateAdminUser(element) {
+//   if (document.getElementById("ip-user-name").value.toLowerCase() == user_profile.user1.user_id) {
+//     if (Number(document.getElementById("ip-user-birth-year").value) != user_profile.user1.user_birth_year) {
+//       admin = false;
+//       return validateYear(element, errMsg.ip_user_birth_year_invalid);
+//     }
+
+//     else {
+//       admin = true;
+//       return displayErrSpan(element, "none", "");
+
+//     }
+//   }
+//   admin = false;
+
+// }
+
+// function validateCharInput(element, errMsg) {
+//   let letters = /^[ a-z]*$/i;
+//   //this.value=this.value.trim();
+//   if (!element.value.match(letters)) {
+//     return displayErrSpan(element, "block", errMsg);
+
+//   }
+//   else {
+//     return displayErrSpan(element, "none", "");
+
+//   }
+
+// }
+
+// function validateAlphaNumInput(element, errMsg) {
+//   //let letters = /^[ a-zA-Z0-9]*$/i;
+
+//   let letters = /^[ :'.\p{L}\p{N}]+$/u;
+//   //this.value=this.value.trim();
+//   if (!element.value.match(letters)) {
+//     return displayErrSpan(element, "block", errMsg);
+
+//   }
+//   else {
+//     return displayErrSpan(element, "none", "");
+
+//   }
+
+// }
+
+// function validateEmail(element, errMsg) {
+//   element.value = element.value.trim();
+//   let mailFormat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/; //Pattern extracted from https://www.w3resource.com/javascript/form/email-validation.php
+//   if (element.value != '' && !element.value.match(mailFormat)) {
+//     return displayErrSpan(element, "block", errMsg);
+
+//   }
+//   else {
+//     return displayErrSpan(element, "none", "");
+
+//   }
+
+// }
+
+// function validateNumber(element, errMsg) {
+//   element.value = element.value.trim();
+//   let numberFormat = /^[0-9]*$/i;
+//   if (!element.value.match(numberFormat)) {
+//     return displayErrSpan(element, "block", errMsg);
+
+//   }
+//   else {
+//     return displayErrSpan(element, "none", "");
+
+//   }
+// }
+
+
+// function validateYear(element, errMsg) {
+//   element.value = element.value.trim();
+
+//   if (element.value != '' && (Number(element.value) > Number(currentYear) || Number(element.value) < 1900)) {
+//     return displayErrSpan(element, "block", errMsg);
+
+//   }
+//   else {
+//     return displayErrSpan(element, "none", "");
+
+//   }
+
+
+
+
+// }
+//End of Comment - Commented as instructed by TA for highlighting the sanitization or validation
 
 function login() {
   let element = document.getElementsByClassName("validate-login");
